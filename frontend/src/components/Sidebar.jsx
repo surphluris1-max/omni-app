@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, CheckSquare, Users, CreditCard, Stethoscope, LogOut } from 'lucide-react';
+import { Home, CheckSquare, Users, CreditCard, Stethoscope, MessageCircle, LogOut, Edit3 } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import './Sidebar.css';
 
@@ -33,6 +33,14 @@ const Sidebar = () => {
         <NavLink to="/health" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
           <Stethoscope size={20} />
           <span>Plant/Pet Health</span>
+        </NavLink>
+        <NavLink to="/messages" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
+          <MessageCircle size={20} />
+          <span>Messages</span>
+        </NavLink>
+        <NavLink to="/notepad" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
+          <Edit3 size={20} />
+          <span>Notepad</span>
         </NavLink>
       </nav>
 

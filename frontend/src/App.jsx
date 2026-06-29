@@ -9,6 +9,8 @@ import Tasks from './components/Tasks';
 import Social from './components/Social';
 import Bills from './components/Bills';
 import Health from './components/Health';
+import Messages from './components/Messages';
+import Notepad from './components/Notepad';
 
 const AppLayout = () => {
   const { user } = useUser();
@@ -27,6 +29,8 @@ const AppLayout = () => {
           <Route path="/social" element={<Social />} />
           <Route path="/bills" element={<Bills />} />
           <Route path="/health" element={<Health />} />
+          <Route path="/messages" element={<Messages />} />
+          <Route path="/notepad" element={<Notepad />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
