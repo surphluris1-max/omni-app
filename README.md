@@ -1,6 +1,6 @@
 # OmniTool - Multi-Tool Super App
 
-A responsive, full-stack web application combining productivity, social sharing, finance, AI tools, and messaging into one beautiful interface.
+A responsive, full-stack web application combining productivity, social sharing, finance, AI tools, and messaging into one beautiful interface. Call it a Small dino app cuz it have more than one feature
 
 ## ✨ Features
 
@@ -21,7 +21,8 @@ A responsive, full-stack web application combining productivity, social sharing,
 
 ### 👥 Social System & Friends
 - **No password login** — just enter a name, optional email, and upload a profile picture
-- Every user gets a unique **9-digit ID** for identity
+- Every user gets a unique **9-digit ID** for identity (to make the testers work easy this feature is their so that the guests accounts
+- dont have to give their gmails and they could use the app as much as they want)
 - Add friends by their ID or share a **link** — no phone number or email needed
 - Friends appear in your friend list for tagging and messaging
 
@@ -30,7 +31,7 @@ A responsive, full-stack web application combining productivity, social sharing,
 - **Group creation** — create named groups, pick friends as members
 - **Group chat** — full chat interface within groups
 - **Auto-expiry** — messages disappear after **3 days** automatically
-- **Star messages** ⭐ — star-marked messages stay for **3 weeks** instead
+- **Star messages** ⭐ — star-marked messages stay for **3 weeks** instead (to prevent storage overload cuz its currently on browser based)
 - Each message shows a countdown (e.g. "2d left") and a star button
 - Expiry cleanup runs every minute in the background
 
@@ -61,7 +62,8 @@ A responsive, full-stack web application combining productivity, social sharing,
 | Feature | Duration | Notes |
 |---------|----------|-------|
 | Messages (default) | **3 days** | Auto-deleted after 3 days |
-| Starred messages | **3 weeks** | Star ⭐ a message to extend its life |
+| Starred messages | **3 weeks** | Star ⭐ a message to extend its life | (this feature is because the app is currently on browser so stroage have problem
+to resolve stroge problem and to avoide use of mongodb or firebase this mechanics was used)
 | Tasks | **Permanent** | Stored in localStorage until manually deleted |
 | Expenses | **Permanent** | Stored in localStorage until manually deleted |
 | User session | **Permanent** | Stored until logout |
