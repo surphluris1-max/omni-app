@@ -1,0 +1,122 @@
+.bills-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.add-expense-container, .recent-expenses-container {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.expense-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-with-icon .icon {
+  position: absolute;
+  left: 1rem;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.input-with-icon .input-field {
+  padding-left: 2.5rem;
+}
+
+.tag-friends-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.friend-tag {
+  background: var(--color-surface);
+  border: var(--border-subtle);
+  color: var(--color-text-muted);
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.friend-tag:hover {
+  background: var(--color-surface-hover);
+}
+
+.friend-tag.selected {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.expense-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.expense-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(30, 41, 59, 0.4);
+  border-radius: var(--radius-sm);
+  border: var(--border-subtle);
+  gap: 1rem;
+}
+
+.expense-info, .expense-amounts {
+  display: flex;
+  flex-direction: column;
+}
+
+.expense-amounts {
+  align-items: flex-end;
+}
+
+.expense-desc {
+  font-weight: 500;
+}
+
+.expense-date, .text-sm {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.total-amount {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-main);
+}
+
+.split-amount {
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.expense-delete {
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.expense-item:hover .expense-delete {
+  opacity: 1;
+}

@@ -1,0 +1,80 @@
+.health-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.checkup-container, .results-container {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.type-selector {
+  display: flex;
+  gap: 1rem;
+  background: rgba(0,0,0,0.2);
+  padding: 0.5rem;
+  border-radius: var(--radius-full);
+}
+
+.type-btn {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: var(--radius-full);
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.type-btn.active {
+  background: var(--color-surface-hover);
+  color: var(--color-text-main);
+  box-shadow: var(--shadow-glass);
+}
+
+.symptom-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.symptom-input {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.spin {
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+.results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.result-item {
+  background: rgba(16, 185, 129, 0.1);
+  border-left: 4px solid var(--color-accent);
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+}
+
+.disease-name {
+  color: var(--color-text-main);
+  margin-bottom: 0.25rem;
+}
+
+.disease-desc {
+  font-size: 0.9rem;
+  margin: 0;
+}
