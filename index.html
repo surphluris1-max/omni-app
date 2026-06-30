@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="OmniTool - A multi-tool productivity app with tasks, notes, messaging, and more.">
+  <title>OmniTool - Multi-Tool App</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* =============== DESIGN SYSTEM (index.css) =============== */
+    :root {
+      --color-bg: #0f172a;
+      --color-surface: rgba(30, 41, 59, 0.7);
+      --color-surface-hover: rgba(51, 65, 85, 0.8);
+      --color-primary: #3b82f6;
+      --color-primary-glow: rgba(59, 130, 246, 0.5);
+      --color-secondary: #8b5cf6;
+      --color-accent: #10b981;
+      --color-danger: #ef4444;
+      --color-warning: #f59e0b;
+      --color-text-main: #f8fafc;
+      --color-text-muted: #94a3b8;
+      --border-subtle: 1px solid rgba(255, 255, 255, 0.1);
+      --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      --shadow-glow: 0 0 20px var(--color-primary-glow);
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-full: 9999px;
+      --transition-fast: 0.15s ease;
+      --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-bounce: 0.5s cubic-bezier(0.68, -0.55, 0.26, 1.55);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--color-bg);
+      color: var(--color-text-main);
+      background-image:
+        radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15), transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15), transparent 25%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    .glass-panel {
+      background: var(--color-surface);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: var(--border-subtle);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-glass);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+    .glass-panel:hover { box-shadow: var(--shadow-glow); }
+    h1, h2, h3, h4, h5, h6 { font-weight: 600; line-height: 1.2; margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+    h1 { font-size: 2.5rem; } h2 { font-size: 2rem; } h3 { font-size: 1.5rem; }
+    p { color: var(--color-text-muted); margin-bottom: 1rem; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+      padding: 0.75rem 1.5rem; border-radius: var(--radius-full); font-family: inherit;
+      font-weight: 500; font-size: 1rem; cursor: pointer; border: none;
+      transition: all var(--transition-bounce); outline: none;
+    }
+    .btn:active { transform: scale(0.95); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+      color: white; box-shadow: 0 4px 15px var(--color-primary-glow);
+    }
+    .btn-primary:hover { box-shadow: 0 6px 20px var(--color-primary-glow); transform: translateY(-2px); }
+    .btn-ghost { background: transparent; color: var(--color-text-main); border: var(--border-subtle); }
+    .btn-ghost:hover { background: var(--color-surface-hover); }
+    .input-field {
+      width: 100%; padding: 0.75rem 1rem; border-radius: var(--radius-md);
+      background: rgba(15, 23, 42, 0.6); border: var(--border-subtle);
+      color: var(--color-text-main); font-family: inherit; font-size: 1rem;
+      transition: all var(--transition-normal);
+    }
+    .input-field:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 2px var(--color-primary-glow); }
+    .input-field::placeholder { color: rgba(148, 163, 184, 0.5); }
+    .app-container { display: flex; min-height: 100vh; }
+    .main-content { flex: 1; padding: 2rem; max-width: 1200px; margin: 0 auto; }
+    .grid-layout { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+    .flex-center { display: flex; align-items: center; justify-content: center; }
+    .flex-between { display: flex; align-items: center; justify-content: space-between; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in { animation: fadeIn 0.4s ease forwards; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--color-bg); }
+    ::-webkit-scrollbar-thumb { background: var(--color-surface-hover); border-radius: var(--radius-full); }
+    ::-webkit-scrollbar-thumb:hover { background: var(--color-primary); }
+    @media (max-width: 768px) {
+      .app-container { flex-direction: column; }
+      .main-content { padding: 1rem; }
+      h1 { font-size: 2rem; }
+    }
+
+    /* =============== SIDEBAR =============== */
+    .sidebar { width: 260px; height: calc(100vh - 2rem); margin: 1rem 0 1rem 1rem; display: flex; flex-direction: column; position: sticky; top: 1rem; flex-shrink: 0; }
+    .sidebar-header { padding: 1.5rem; border-bottom: var(--border-subtle); }
+    .sidebar-header h2 { background: linear-gradient(to right, var(--color-primary), var(--color-secondary)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin: 0; }
+    .sidebar-nav { flex: 1; padding: 1.5rem 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .nav-item { display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1rem; color: var(--color-text-muted); text-decoration: none; border-radius: var(--radius-sm); transition: all var(--transition-fast); font-weight: 500; cursor: pointer; background: none; border: none; font-family: inherit; font-size: 1rem; width: 100%; text-align: left; }
+    .nav-item:hover { background: var(--color-surface-hover); color: var(--color-text-main); }
+    .nav-item.active { background: var(--color-primary-glow); color: var(--color-text-main); border-left: 3px solid var(--color-primary); }
+    .sidebar-footer { padding: 1.5rem; border-top: var(--border-subtle); display: flex; align-items: center; justify-content: space-between; }
+    .user-info { display: flex; align-items: center; gap: 0.75rem; overflow: hidden; }
+    .pfp-small { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+    .pfp-placeholder { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; flex-shrink: 0; font-size: 0.9rem; }
+    .user-details { display: flex; flex-direction: column; }
+    .user-name { font-size: 0.9rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; }
+    .user-id { font-size: 0.75rem; color: var(--color-text-muted); }
+    .logout-btn { padding: 0.5rem; border-radius: var(--radius-sm); cursor: pointer; }
+    @media (max-width: 768px) {
+      .sidebar { width: 100%; height: auto; margin: 0; position: static; border-radius: 0; border: none; border-bottom: var(--border-subtle); }
+      .sidebar-header { display: none; }
+      .sidebar-footer { display: none; }
+      .sidebar-nav { flex-direction: row; overflow-x: auto; padding: 0.75rem; gap: 0.25rem; }
+      .nav-item span { display: none; }
+      .nav-item { padding: 0.75rem; gap: 0; justify-content: center; }
+      .nav-item.active { border-left: none; border-bottom: 3px solid var(--color-primary); border-radius: 0; }
+    }
+
+    /* =============== LOGIN =============== */
+    .login-container { min-height: 100vh; padding: 1rem; }
+    .login-card { width: 100%; max-width: 420px; padding: 2.5rem; display: flex; flex-direction: column; gap: 2rem; }
+    .login-header { text-align: center; }
+    .login-header h2 { background: linear-gradient(to right, var(--color-primary), var(--color-secondary)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .login-form { display: flex; flex-direction: column; gap: 1.5rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+    .form-group label { font-size: 0.9rem; color: var(--color-text-muted); font-weight: 500; }
+    .w-full { width: 100%; }
+    .pfp-upload-row { display: flex; align-items: center; gap: 1rem; }
+    .pfp-preview { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-primary); }
+    .file-upload-btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.6rem 1.2rem; border-radius: var(--radius-full); font-family: inherit; font-weight: 500; font-size: 0.9rem; cursor: pointer; border: var(--border-subtle); background: transparent; color: var(--color-text-main); transition: all var(--transition-fast); }
+    .file-upload-btn:hover { background: var(--color-surface-hover); }
+
+    /* =============== DASHBOARD =============== */
+    .dashboard-page { display: flex; flex-direction: column; gap: 2rem; }
+    .dashboard-header { margin-bottom: 1rem; }
+    .widget { padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+    .widget-header { display: flex; justify-content: space-between; align-items: center; border-bottom: var(--border-subtle); padding-bottom: 0.5rem; }
+    .widget-header h3 { display: flex; align-items: center; gap: 0.5rem; margin: 0; font-size: 1.1rem; }
+    .aqi-badge { padding: 0.25rem 0.75rem; border-radius: var(--radius-full); font-size: 0.8rem; font-weight: 600; color: white; }
+    .widget-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+    .aqi-main { display: flex; align-items: baseline; gap: 0.5rem; margin: 1rem 0; }
+    .aqi-value { font-size: 3rem; font-weight: 700; line-height: 1; }
+    .aqi-scale { color: var(--color-text-muted); font-size: 0.9rem; }
+    .aqi-details { font-size: 0.85rem; color: var(--color-text-muted); display: flex; flex-direction: column; gap: 0.25rem; }
+    .aqi-details p { display: flex; align-items: center; gap: 0.5rem; margin: 0; }
+    .text-danger { color: var(--color-danger); }
+    .text-sm { font-size: 0.8rem; }
+    .text-muted { color: var(--color-text-muted); }
+    .stat-circle { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--color-primary); display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(15, 23, 42, 0.4); }
+    .stat-num { font-size: 2.5rem; font-weight: 700; color: var(--color-text-main); }
+    .stat-label { font-size: 0.9rem; color: var(--color-text-muted); }
+
+    /* =============== TASKS =============== */
+    .tasks-page { display: flex; flex-direction: column; gap: 2rem; }
+    .tasks-header { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem; }
+    .tasks-container { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+    .stats-container { padding: 1.5rem; }
+    .flex-col-gap { display: flex; flex-direction: column; gap: 2rem; }
+    .stat-card { display: flex; flex-direction: column; }
+    .folder-tabs { display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.5rem; align-items: center; }
+    .folder-tab { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--color-surface); border: var(--border-subtle); border-radius: var(--radius-full); color: var(--color-text-muted); cursor: pointer; transition: all var(--transition-fast); white-space: nowrap; font-family: inherit; font-size: 0.9rem; }
+    .folder-tab:hover { background: var(--color-surface-hover); }
+    .folder-tab.active { background: var(--color-primary-glow); color: var(--color-text-main); border-color: var(--color-primary); }
+    .group-tab { border-style: dashed; }
+    .group-tab.active { border-style: solid; border-color: var(--color-accent); background: rgba(6, 182, 212, 0.15); }
+    .new-folder-input { display: flex; align-items: center; }
+    .flex-col { display: flex; flex-direction: column; gap: 0.75rem; }
+    .task-input-row { display: flex; gap: 0.5rem; }
+    .task-input-form { display: flex; flex-direction: column; gap: 0.75rem; }
+    .assignee-select { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: var(--color-surface); border-radius: var(--radius-sm); }
+    .select-sm { padding: 0.25rem 0.5rem; font-size: 0.85rem; height: auto; min-width: 120px; }
+    .btn-icon { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; flex-shrink: 0; border-radius: var(--radius-md); background: var(--color-surface-hover); border: var(--border-subtle); color: var(--color-text-main); cursor: pointer; transition: all var(--transition-fast); }
+    .btn-icon:hover { background: var(--color-primary-glow); }
+    .btn-icon.listening { background: var(--color-danger); animation: pulse 1.5s infinite; }
+    .add-btn { background: var(--color-primary); border: none; }
+    .task-list { display: flex; flex-direction: column; gap: 0.75rem; max-height: 400px; overflow-y: auto; padding-right: 0.5rem; }
+    .task-item { display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(30, 41, 59, 0.4); border-radius: var(--radius-sm); border: var(--border-subtle); transition: all var(--transition-fast); }
+    .task-item:hover { background: var(--color-surface-hover); }
+    .status-completed { opacity: 0.6; }
+    .status-completed .task-text { text-decoration: line-through; }
+    .status-abandoned { opacity: 0.5; border-color: rgba(239, 68, 68, 0.3); }
+    .status-abandoned .task-text { text-decoration: line-through; color: var(--color-danger); }
+    .status-extended { border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.05); }
+    .check-btn { background: none; border: none; cursor: pointer; color: var(--color-text-muted); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .task-content { flex: 1; display: flex; flex-direction: column; }
+    .task-text { font-size: 1rem; }
+    .task-assignee { font-size: 0.7rem; color: var(--color-accent); display: flex; align-items: center; gap: 4px; margin-top: 0.25rem; }
+    .task-actions { display: flex; align-items: center; gap: 0.5rem; opacity: 0; transition: opacity var(--transition-fast); }
+    .task-item:hover .task-actions { opacity: 1; }
+    .action-btn { background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0.25rem; border-radius: 4px; transition: all var(--transition-fast); }
+    .action-btn:hover { background: var(--color-surface); }
+    .text-warning { color: var(--color-warning); }
+    .hover-danger:hover { color: var(--color-danger); }
+    .empty-state { text-align: center; padding: 2rem; color: var(--color-text-muted); font-style: italic; }
+    .chart-legend { margin-top: 0.5rem; font-weight: 500; display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; font-size: 0.85rem; }
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+    @media (max-width: 768px) {
+      .tasks-header { flex-direction: column; align-items: stretch; }
+      .task-actions { opacity: 1; }
+    }
+
+    /* =============== SOCIAL =============== */
+    .social-page { display: flex; flex-direction: column; gap: 2rem; }
+    .add-friend-container, .friends-list-container { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+    .add-friend-form { display: flex; gap: 0.5rem; }
+    .divider { display: flex; align-items: center; text-align: center; color: var(--color-text-muted); margin: 1rem 0; }
+    .divider::before, .divider::after { content: ''; flex: 1; border-bottom: var(--border-subtle); }
+    .divider span { padding: 0 1rem; font-size: 0.8rem; font-weight: 600; }
+    .share-link-box { display: flex; flex-direction: column; gap: 0.5rem; }
+    .share-label { font-size: 0.9rem; font-weight: 500; }
+    .link-wrapper { display: flex; gap: 0.5rem; }
+    .link-input { background: rgba(0,0,0,0.2); color: var(--color-text-muted); }
+    .friends-list { display: flex; flex-direction: column; gap: 1rem; }
+    .friend-item { display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(30, 41, 59, 0.4); border-radius: var(--radius-sm); border: var(--border-subtle); }
+    .friend-details { display: flex; flex-direction: column; }
+    .friend-name { font-weight: 500; }
+    .friend-id { font-size: 0.75rem; color: var(--color-text-muted); }
+
+    /* =============== BILLS =============== */
+    .bills-page { display: flex; flex-direction: column; gap: 2rem; }
+    .add-expense-container, .recent-expenses-container { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+    .expense-form { display: flex; flex-direction: column; gap: 1.2rem; }
+    .input-with-icon { position: relative; display: flex; align-items: center; }
+    .input-with-icon .icon-inside { position: absolute; left: 1rem; color: var(--color-text-muted); pointer-events: none; }
+    .input-with-icon .input-field { padding-left: 2.5rem; }
+    .tag-friends-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .friend-tag { background: var(--color-surface); border: var(--border-subtle); color: var(--color-text-muted); padding: 0.4rem 0.8rem; border-radius: var(--radius-full); font-size: 0.85rem; font-family: inherit; cursor: pointer; transition: all var(--transition-fast); }
+    .friend-tag:hover { background: var(--color-surface-hover); }
+    .friend-tag.selected { background: var(--color-primary); color: white; border-color: var(--color-primary); }
+    .expense-list { display: flex; flex-direction: column; gap: 1rem; max-height: 400px; overflow-y: auto; }
+    .expense-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(30, 41, 59, 0.4); border-radius: var(--radius-sm); border: var(--border-subtle); gap: 1rem; }
+    .expense-info, .expense-amounts { display: flex; flex-direction: column; }
+    .expense-amounts { align-items: flex-end; }
+    .expense-desc { font-weight: 500; }
+    .expense-date { font-size: 0.75rem; color: var(--color-text-muted); }
+    .total-amount { font-size: 1.1rem; font-weight: 600; color: var(--color-text-main); }
+    .split-amount { font-size: 0.8rem; display: flex; align-items: center; gap: 4px; }
+    .delete-btn { background: none; border: none; cursor: pointer; color: var(--color-text-muted); display: flex; align-items: center; padding: 0.25rem; border-radius: 4px; transition: all var(--transition-fast); }
+    .delete-btn:hover { color: var(--color-danger); }
+    .expense-delete { opacity: 0; transition: opacity var(--transition-fast); }
+    .expense-item:hover .expense-delete { opacity: 1; }
+
+    /* =============== HEALTH REMOVED =============== */
+
+    /* =============== MESSAGES =============== */
+    .messages-page { display: flex; flex-direction: column; gap: 2rem; height: calc(100vh - 4rem); }
+    .messages-header { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem; }
+    .chat-list-panel { padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+    .chat-list { display: flex; flex-direction: column; gap: 0.5rem; max-height: 400px; overflow-y: auto; }
+    .chat-list-item { display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1rem; background: rgba(30, 41, 59, 0.4); border: var(--border-subtle); border-radius: var(--radius-sm); cursor: pointer; transition: all var(--transition-fast); text-align: left; width: 100%; color: var(--color-text-main); font-family: inherit; }
+    .chat-list-item:hover { background: var(--color-surface-hover); border-color: var(--color-primary); }
+    .chat-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; flex-shrink: 0; font-size: 0.9rem; }
+    .group-avatar { background: linear-gradient(135deg, var(--color-accent), #06b6d4); }
+    .chat-list-info { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .chat-list-name { font-weight: 600; font-size: 0.95rem; }
+    .chat-list-preview { font-size: 0.8rem; color: var(--color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .chat-list-time { font-size: 0.7rem; color: var(--color-text-muted); white-space: nowrap; }
+    .chat-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
+    .chat-header { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem; border-bottom: var(--border-subtle); }
+    .chat-header-info { display: flex; align-items: center; gap: 0.75rem; }
+    .chat-header-info h3 { margin: 0; font-size: 1.1rem; }
+    .chat-type-label { font-size: 0.75rem; color: var(--color-text-muted); }
+    .back-btn { width: 40px; height: 40px; border-radius: var(--radius-sm); }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; }
+    .chat-bubble { max-width: 75%; padding: 0.75rem 1rem; border-radius: var(--radius-md); position: relative; animation: fadeIn 0.2s ease; }
+    .chat-bubble p { margin: 0; color: var(--color-text-main); font-size: 0.95rem; line-height: 1.4; }
+    .chat-bubble.mine { align-self: flex-end; background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); border-bottom-right-radius: 4px; }
+    .chat-bubble.theirs { align-self: flex-start; background: var(--color-surface-hover); border-bottom-left-radius: 4px; }
+    .bubble-sender { font-size: 0.7rem; font-weight: 600; color: var(--color-accent); display: block; margin-bottom: 0.25rem; }
+    .chat-header-hint { margin-left: auto; }
+    .expiry-hint { font-size: 0.7rem; color: var(--color-text-muted); background: rgba(0, 0, 0, 0.2); padding: 0.3rem 0.7rem; border-radius: var(--radius-full); white-space: nowrap; }
+    .bubble-footer { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.35rem; justify-content: flex-end; }
+    .bubble-time { font-size: 0.65rem; color: rgba(255, 255, 255, 0.5); }
+    .bubble-expiry { font-size: 0.6rem; color: rgba(255, 255, 255, 0.4); font-style: italic; }
+    .star-btn { background: none; border: none; cursor: pointer; color: rgba(255, 255, 255, 0.4); display: flex; align-items: center; padding: 0; transition: all var(--transition-fast); }
+    .star-btn:hover { color: var(--color-warning); transform: scale(1.3); }
+    .star-btn.active { color: var(--color-warning); }
+    .chat-bubble.starred { border: 1px solid rgba(245, 158, 11, 0.3); box-shadow: 0 0 8px rgba(245, 158, 11, 0.15); }
+    .chat-input-form { display: flex; gap: 0.5rem; padding: 1rem 1.5rem; border-top: var(--border-subtle); }
+    .send-btn { background: var(--color-primary); border: none; flex-shrink: 0; }
+    .send-btn:hover { background: var(--color-secondary); }
+    .create-group-panel { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; }
+    .panel-header { display: flex; align-items: center; gap: 1rem; }
+    .panel-header h2 { margin: 0; }
+    .create-group-form { display: flex; flex-direction: column; gap: 1.5rem; }
+    .member-select-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .member-chip { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: var(--color-surface); border: var(--border-subtle); border-radius: var(--radius-full); color: var(--color-text-muted); cursor: pointer; transition: all var(--transition-fast); font-family: inherit; font-size: 0.85rem; }
+    .member-chip:hover { background: var(--color-surface-hover); }
+    .member-chip.selected { background: var(--color-primary); color: white; border-color: var(--color-primary); }
+    .pfp-placeholder.small { width: 24px; height: 24px; font-size: 0.7rem; }
+    .selected-count { font-size: 0.8rem; color: var(--color-accent); margin: 0; }
+    @media (max-width: 768px) {
+      .messages-page { height: auto; }
+      .chat-bubble { max-width: 90%; }
+    }
+
+    /* =============== NOTEPAD =============== */
+    .notepad-page { display: flex; flex-direction: column; gap: 2rem; }
+    .notepad-header { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem; }
+    .notepad-actions { display: flex; gap: 0.5rem; }
+    .editor-panel { padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+    .editor-toolbar { display: flex; gap: 0.5rem; }
+    .title-input { flex: 1; }
+    .btn-sm { padding: 0.5rem 1rem; font-size: 0.85rem; }
+    .text-editor { min-height: 350px; resize: vertical; font-size: 1rem; line-height: 1.7; }
+    .draw-toolbar { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; padding: 0.75rem; background: rgba(0, 0, 0, 0.2); border-radius: var(--radius-sm); }
+    .color-picker { display: flex; gap: 0.35rem; }
+    .color-dot { width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: all var(--transition-fast); }
+    .color-dot:hover { transform: scale(1.2); }
+    .color-dot.active { border-color: white; box-shadow: 0 0 8px rgba(255, 255, 255, 0.5); }
+    .size-picker { display: flex; gap: 0.35rem; align-items: center; }
+    .size-dot { width: 32px; height: 32px; border-radius: 50%; background: none; border: var(--border-subtle); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all var(--transition-fast); }
+    .size-dot span { border-radius: 50%; background: var(--color-text-muted); display: block; }
+    .size-dot.active { border-color: var(--color-primary); }
+    .size-dot.active span { background: var(--color-primary); }
+    .tool-btn { width: 36px; height: 36px; border-radius: var(--radius-sm); }
+    .eraser-active { background: var(--color-warning) !important; color: var(--color-bg); }
+    .draw-canvas { width: 100%; height: 350px; background: var(--color-bg); border: var(--border-subtle); border-radius: var(--radius-sm); cursor: crosshair; touch-action: none; }
+    .notes-list-panel { padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+    .notes-list { display: flex; flex-direction: column; gap: 0.75rem; max-height: 500px; overflow-y: auto; }
+    .note-card { background: rgba(30, 41, 59, 0.4); border: var(--border-subtle); border-radius: var(--radius-sm); padding: 0.75rem; cursor: pointer; transition: all var(--transition-fast); }
+    .note-card:hover { background: var(--color-surface-hover); border-color: var(--color-primary); }
+    .note-card-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+    .note-type-badge { font-size: 1.1rem; }
+    .note-title { flex: 1; font-weight: 600; font-size: 0.9rem; }
+    .note-thumbnail { width: 100%; height: 80px; object-fit: cover; border-radius: 4px; background: var(--color-bg); }
+    .note-preview { font-size: 0.8rem; color: var(--color-text-muted); margin: 0; line-height: 1.4; }
+    @media (max-width: 768px) {
+      .notepad-actions { flex-direction: column; width: 100%; }
+      .draw-canvas { height: 250px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root">
+    <div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0f172a;color:#f8fafc;font-family:'Outfit',sans-serif;flex-direction:column;gap:1rem;">
+      <div style="width:40px;height:40px;border:3px solid rgba(59,130,246,0.3);border-top-color:#3b82f6;border-radius:50%;animation:spin 1s linear infinite;"></div>
+      <p style="color:#94a3b8;font-size:0.9rem;">Loading OmniTool...</p>
+    </div>
+  </div>
+
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useCallback, createContext, useContext } = React;
+
+    // ==================== ICON COMPONENT ====================
+    const ICON_PATHS = {
+      home: '<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>',
+      checkSquare: '<polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>',
+      users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>',
+      creditCard: '<rect width="22" height="16" x="1" y="4" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line>',
+      stethoscope: '<path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"></path><path d="M8 15v1a6 6 0 0 0 6 6h.87"></path><path d="M18 22a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path>',
+      messageCircle: '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>',
+      logOut: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line>',
+      edit3: '<path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path>',
+      wind: '<path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"></path><path d="M9.6 4.6A2 2 0 1 1 11 8H2"></path><path d="M12.6 19.4A2 2 0 1 0 14 16H2"></path>',
+      mapPin: '<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle>',
+      mic: '<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line>',
+      micOff: '<line x1="2" y1="2" x2="22" y2="22"></line><path d="M18.89 13.23A7.12 7.12 0 0 0 19 12v-2"></path><path d="M5 10v2a7 7 0 0 0 12 5"></path><path d="M15 9.34V5a3 3 0 0 0-5.68-1.33"></path><path d="M9 9v3a3 3 0 0 0 5.12 2.12"></path><line x1="12" y1="19" x2="12" y2="22"></line>',
+      sparkles: '<path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z"></path><path d="M5 3v4"></path><path d="M19 17v4"></path><path d="M3 5h4"></path><path d="M17 19h4"></path>',
+      plus: '<line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>',
+      checkCircle: '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><path d="m9 11 3 3L22 4"></path>',
+      circle: '<circle cx="12" cy="12" r="10"></circle>',
+      folder: '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>',
+      trash2: '<polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line>',
+      folderPlus: '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path><line x1="12" y1="11" x2="12" y2="17"></line><line x1="9" y1="14" x2="15" y2="14"></line>',
+      xCircle: '<circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>',
+      clock: '<circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>',
+      user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>',
+      userPlus: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line>',
+      copy: '<rect width="13" height="13" x="9" y="9" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>',
+      dollarSign: '<line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>',
+      tag: '<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line>',
+      bell: '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path>',
+      shoppingCart: '<circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>',
+      search: '<circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path>',
+      heartPulse: '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"></path>',
+      activity: '<path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>',
+      send: '<path d="m22 2-7 20-4-9-9-4Z"></path><path d="M22 2 11 13"></path>',
+      arrowLeft: '<path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path>',
+      star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>',
+      hash: '<line x1="4" y1="9" x2="20" y2="9"></line><line x1="4" y1="15" x2="20" y2="15"></line><line x1="10" y1="3" x2="8" y2="21"></line><line x1="16" y1="3" x2="14" y2="21"></line>',
+      save: '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline>',
+      penTool: '<path d="m12 19 7-7 3 3-7 7-3-3z"></path><path d="m18 13-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="m2 2 7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle>',
+      type: '<polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line>',
+      eraser: '<path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"></path><path d="M22 21H7"></path><path d="m5 11 9 9"></path>',
+      download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line>',
+    };
+
+    const Icon = ({ name, size = 24, color, fill, className, style }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill={fill || 'none'}
+        stroke={color || 'currentColor'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+        className={className || ''} style={style || {}}
+        dangerouslySetInnerHTML={{ __html: ICON_PATHS[name] || '' }} />
+    );
+
+    // ==================== SVG CHARTS ====================
+    const DonutChart = ({ data, colors }) => {
+      const total = data.reduce((s, d) => s + d.value, 0);
+      if (total === 0) return null;
+      const cx = 100, cy = 100, outerR = 70, innerR = 40;
+      let angle = -90;
+      const toRad = (deg) => (deg * Math.PI) / 180;
+      const segments = data.map((d, i) => {
+        const sweep = Math.min((d.value / total) * 360, 359.99);
+        const s = angle, e = angle + sweep;
+        angle = e;
+        const x1 = cx + outerR * Math.cos(toRad(s)), y1 = cy + outerR * Math.sin(toRad(s));
+        const x2 = cx + outerR * Math.cos(toRad(e)), y2 = cy + outerR * Math.sin(toRad(e));
+        const x3 = cx + innerR * Math.cos(toRad(e)), y3 = cy + innerR * Math.sin(toRad(e));
+        const x4 = cx + innerR * Math.cos(toRad(s)), y4 = cy + innerR * Math.sin(toRad(s));
+        const la = sweep > 180 ? 1 : 0;
+        const path = `M ${x1} ${y1} A ${outerR} ${outerR} 0 ${la} 1 ${x2} ${y2} L ${x3} ${y3} A ${innerR} ${innerR} 0 ${la} 0 ${x4} ${y4} Z`;
+        return { path, color: colors[i], name: d.name, value: d.value };
+      });
+      return (
+        <svg viewBox="0 0 200 200" style={{ width: '100%', maxWidth: 200, margin: '0 auto', display: 'block' }}>
+          {segments.map((seg, i) => (
+            <path key={i} d={seg.path} fill={seg.color} opacity="0.85" style={{ cursor: 'default' }}>
+              <title>{seg.name}: {seg.value}</title>
+            </path>
+          ))}
+        </svg>
+      );
+    };
+
+    const HBarChart = ({ data, barColor = '#06b6d4' }) => {
+      const maxVal = Math.max(...data.map(d => d.completed), 1);
+      const barH = 20, gap = 10, labelW = 70, w = 280;
+      const h = data.length * (barH + gap);
+      return (
+        <svg viewBox={`0 0 ${w} ${h}`} style={{ width: '100%', maxWidth: w }}>
+          {data.map((d, i) => {
+            const y = i * (barH + gap);
+            const bw = Math.max((d.completed / maxVal) * (w - labelW - 10), 2);
+            return (
+              <g key={i}>
+                <text x={0} y={y + barH / 2 + 5} fill="#94a3b8" fontSize="12" fontFamily="Outfit, sans-serif">{d.name}</text>
+                <rect x={labelW} y={y} width={bw} height={barH} fill={barColor} rx="4" ry="4" opacity="0.8">
+                  <title>{d.name}: {d.completed}</title>
+                </rect>
+              </g>
+            );
+          })}
+        </svg>
+      );
+    };
+
+    // ==================== USER CONTEXT ====================
+    const UserContext = createContext(null);
+    const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
+    const THREE_WEEKS_MS = 21 * 24 * 60 * 60 * 1000;
+
+    const UserProvider = ({ children }) => {
+      const [user, setUser] = useState(() => { const s = localStorage.getItem('omnitool_user'); return s ? JSON.parse(s) : null; });
+      const [groups, setGroups] = useState(() => { const s = localStorage.getItem('omnitool_groups'); return s ? JSON.parse(s) : []; });
+      const [messages, setMessages] = useState(() => { const s = localStorage.getItem('omnitool_messages'); return s ? JSON.parse(s) : []; });
+
+      useEffect(() => {
+        const cleanup = () => {
+          const now = Date.now();
+          setMessages(prev => {
+            const filtered = prev.filter(msg => {
+              const age = now - new Date(msg.timestamp).getTime();
+              return msg.starred ? age < THREE_WEEKS_MS : age < THREE_DAYS_MS;
+            });
+            return filtered.length !== prev.length ? filtered : prev;
+          });
+        };
+        cleanup();
+        const interval = setInterval(cleanup, 60 * 1000);
+        return () => clearInterval(interval);
+      }, []);
+
+      useEffect(() => { user ? localStorage.setItem('omnitool_user', JSON.stringify(user)) : localStorage.removeItem('omnitool_user'); }, [user]);
+      useEffect(() => { localStorage.setItem('omnitool_groups', JSON.stringify(groups)); }, [groups]);
+      useEffect(() => { localStorage.setItem('omnitool_messages', JSON.stringify(messages)); }, [messages]);
+
+      const login = (userData) => {
+        const id = userData.id || Math.floor(100000000 + Math.random() * 900000000).toString();
+        setUser({ ...userData, id, friends: userData.friends || [] });
+      };
+      const logout = () => setUser(null);
+      const updateUser = (updates) => {
+        if (user) setUser({ ...user, ...updates });
+      };
+      const addFriend = (friendId) => {
+        if (user && !user.friends.includes(friendId)) setUser({ ...user, friends: [...user.friends, friendId] });
+      };
+      const createGroup = (name, memberIds) => {
+        const g = { id: 'grp_' + Date.now(), name, members: [user.id, ...memberIds], createdBy: user.id, createdAt: new Date().toISOString() };
+        setGroups([...groups, g]);
+        return g;
+      };
+      const sendMessage = (chatId, chatType, text) => {
+        const msg = { id: 'msg_' + Date.now(), chatId, chatType, from: user.id, fromName: user.name, text, timestamp: new Date().toISOString(), starred: false };
+        setMessages(prev => [...prev, msg]);
+        return msg;
+      };
+      const toggleStarMessage = (msgId) => { setMessages(prev => prev.map(m => m.id === msgId ? { ...m, starred: !m.starred } : m)); };
+      const getMessages = (chatId) => messages.filter(m => m.chatId === chatId);
+      const getMessageExpiry = (msg) => {
+        const age = Date.now() - new Date(msg.timestamp).getTime();
+        const maxAge = msg.starred ? THREE_WEEKS_MS : THREE_DAYS_MS;
+        const remaining = maxAge - age;
+        if (remaining <= 0) return 'Expiring soon';
+        const hours = Math.floor(remaining / (1000 * 60 * 60));
+        const days = Math.floor(hours / 24);
+        if (days > 0) return `${days}d left`;
+        if (hours > 0) return `${hours}h left`;
+        return '< 1h left';
+      };
+
+      return (
+        <UserContext.Provider value={{ user, login, logout, updateUser, addFriend, groups, createGroup, messages, sendMessage, getMessages, toggleStarMessage, getMessageExpiry }}>
+          {children}
+        </UserContext.Provider>
+      );
+    };
+    const useUser = () => useContext(UserContext);
+
+    // ==================== LOGIN ====================
+    const Login = () => {
+      const { login } = useUser();
+      const [name, setName] = useState('');
+      const [email, setEmail] = useState('');
+
+      const handleSubmit = (e) => { e.preventDefault(); if (!name.trim()) return; login({ name, email }); };
+
+      return (
+        <div className="login-container flex-center">
+          <div className="glass-panel login-card animate-fade-in">
+            <div className="login-header">
+              <h2>Welcome to OmniTool</h2>
+              <p>Enter your details to get started. No password required.</p>
+            </div>
+            <form onSubmit={handleSubmit} className="login-form">
+              <div className="form-group">
+                <label>Name (Required)</label>
+                <input type="text" className="input-field" placeholder="E.g. Alex" value={name} onChange={(e) => setName(e.target.value)} required />
+              </div>
+              <div className="form-group">
+                <label>Email (Optional)</label>
+                <input type="email" className="input-field" placeholder="alex@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+              </div>
+              <button type="submit" className="btn btn-primary w-full">Generate My Unique ID &amp; Enter</button>
+            </form>
+          </div>
+        </div>
+      );
+    };
+
+    // ==================== SIDEBAR ====================
+    const Sidebar = ({ currentPage, setCurrentPage }) => {
+      const { user, logout, updateUser } = useUser();
+      const navItems = [
+        { key: 'dashboard', label: 'Dashboard', icon: 'home' },
+        { key: 'tasks', label: 'Tasks & AI', icon: 'checkSquare' },
+        { key: 'social', label: 'Friends', icon: 'users' },
+        { key: 'bills', label: 'Split Bills', icon: 'creditCard' },
+        { key: 'messages', label: 'Messages', icon: 'messageCircle' },
+        { key: 'notepad', label: 'Notepad', icon: 'edit3' },
+      ];
+
+      const handlePfpUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onloadend = () => updateUser({ pfpUrl: reader.result });
+          reader.readAsDataURL(file);
+        }
+      };
+
+      return (
+        <aside className="sidebar glass-panel">
+          <div className="sidebar-header"><h2>OmniTool</h2></div>
+          <nav className="sidebar-nav">
+            {navItems.map(item => (
+              <button key={item.key} className={`nav-item ${currentPage === item.key ? 'active' : ''}`} onClick={() => setCurrentPage(item.key)}>
+                <Icon name={item.icon} size={20} /><span>{item.label}</span>
+              </button>
+            ))}
+          </nav>
+          {user && (
+            <div className="sidebar-footer">
+              <div className="user-info">
+                <label style={{ cursor: 'pointer', position: 'relative' }} title="Change Profile Picture">
+                  {user.pfpUrl ? <img src={user.pfpUrl} alt="PFP" className="pfp-small" /> : <div className="pfp-placeholder">{user.name.charAt(0)}</div>}
+                  <input type="file" accept="image/*" onChange={handlePfpUpload} style={{ display: 'none' }} />
+                </label>
+                <div className="user-details">
+                  <span className="user-name">{user.name}</span>
+                  <span className="user-id">ID: {user.id}</span>
+                </div>
+              </div>
+              <button onClick={logout} className="btn-ghost logout-btn"><Icon name="logOut" size={16} /></button>
+            </div>
+          )}
+        </aside>
+      );
+    };
+
+    // ==================== DASHBOARD ====================
+    const Dashboard = () => {
+      const { user } = useUser();
+      const [aqiData, setAqiData] = useState(null);
+      const [locationError, setLocationError] = useState('');
+
+      useEffect(() => {
+        if ('geolocation' in navigator) {
+          navigator.geolocation.getCurrentPosition(
+            (pos) => { setTimeout(() => { setAqiData({ aqi: 2, status: 'Fair', pm25: 15.5, location: `Lat: ${pos.coords.latitude.toFixed(2)}, Lon: ${pos.coords.longitude.toFixed(2)}` }); }, 1000); },
+            () => { setLocationError('Location access denied or unavailable. Showing default AQI.'); setAqiData({ aqi: 1, status: 'Good', pm25: 5.2, location: 'Unknown (Default)' }); }
+          );
+        } else { setLocationError('Geolocation not supported.'); }
+      }, []);
+
+      const getAqiColor = (aqi) => {
+        switch(aqi) { case 1: return 'var(--color-accent)'; case 2: return 'var(--color-warning)'; case 3: return 'orange'; case 4: return 'var(--color-danger)'; case 5: return 'darkred'; default: return 'var(--color-text-muted)'; }
+      };
+
+      return (
+        <div className="dashboard-page animate-fade-in">
+          <div className="dashboard-header">
+            <h1>Welcome back, {user.name} 👋</h1>
+            <p>Here's what's happening today.</p>
+          </div>
+          <div className="grid-layout">
+            <div className="glass-panel widget aqi-widget">
+              <div className="widget-header">
+                <h3><Icon name="wind" size={20} /> Air Quality</h3>
+                {aqiData && <span className="aqi-badge" style={{ backgroundColor: getAqiColor(aqiData.aqi) }}>{aqiData.status}</span>}
+              </div>
+              <div className="widget-content">
+                {!aqiData && !locationError && <p className="text-muted">Fetching location &amp; AQI data...</p>}
+                {locationError && <p className="text-danger text-sm">{locationError}</p>}
+                {aqiData && (<>
+                  <div className="aqi-main">
+                    <span className="aqi-value" style={{ color: getAqiColor(aqiData.aqi) }}>{aqiData.aqi}</span>
+                    <span className="aqi-scale">/ 5 AQI Level</span>
+                  </div>
+                  <div className="aqi-details">
+                    <p><Icon name="mapPin" size={14} /> {aqiData.location}</p>
+                    <p>PM2.5: {aqiData.pm25} µg/m³</p>
+                  </div>
+                </>)}
+              </div>
+            </div>
+            <div className="glass-panel widget">
+              <div className="widget-header"><h3><Icon name="checkSquare" size={20} /> Tasks Overview</h3></div>
+              <div className="widget-content flex-center" style={{ flexDirection: 'column', gap: '1rem' }}>
+                <div className="stat-circle">
+                  <span className="stat-num">{JSON.parse(localStorage.getItem('omnitool_tasks') || '[]').filter(t => t.status !== 'completed').length}</span>
+                  <span className="stat-label">Pending</span>
+                </div>
+                <p className="text-muted">Go to Tasks to manage your lists.</p>
+              </div>
+            </div>
+            <div className="glass-panel widget">
+              <div className="widget-header"><h3><Icon name="users" size={20} /> Network</h3></div>
+              <div className="widget-content flex-center" style={{ flexDirection: 'column', gap: '1rem' }}>
+                <div className="stat-circle" style={{ borderColor: 'var(--color-secondary)' }}>
+                  <span className="stat-num">{user.friends.length}</span>
+                  <span className="stat-label">Friends</span>
+                </div>
+                <p className="text-muted">Share lists and split bills.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // ==================== TASKS ====================
+    const Tasks = () => {
+      const { user, groups } = useUser();
+      const [isListening, setIsListening] = useState(false);
+      const [note, setNote] = useState('');
+      const [tasks, setTasks] = useState(() => {
+        const s = localStorage.getItem('omnitool_tasks');
+        if (s) { const p = JSON.parse(s); return p.map(t => ({ ...t, status: t.status || (t.completed ? 'completed' : 'pending'), assigneeId: t.assigneeId || null, completedById: t.completedById || null })); }
+        return [];
+      });
+      const [folders, setFolders] = useState(() => { const s = localStorage.getItem('omnitool_folders'); return s ? JSON.parse(s) : ['General', 'Work', 'Personal']; });
+      const [currentFolder, setCurrentFolder] = useState('General');
+      const [newFolderName, setNewFolderName] = useState('');
+      const [showNewFolder, setShowNewFolder] = useState(false);
+      const [selectedAssignee, setSelectedAssignee] = useState('');
+      const micRef = useRef(null);
+
+      useEffect(() => { localStorage.setItem('omnitool_tasks', JSON.stringify(tasks)); }, [tasks]);
+      useEffect(() => { localStorage.setItem('omnitool_folders', JSON.stringify(folders)); }, [folders]);
+
+      const activeGroup = groups.find(g => g.id === currentFolder);
+      const isGroupView = !!activeGroup;
+
+      const handleListen = () => {
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SR) { alert('Voice input is not supported in your browser. Try Chrome.'); return; }
+        if (isListening && micRef.current) { micRef.current.stop(); setIsListening(false); return; }
+        const mic = new SR(); mic.continuous = true; mic.interimResults = true; mic.lang = 'en-US'; micRef.current = mic;
+        mic.onresult = e => { const t = Array.from(e.results).map(r => r[0].transcript).join(''); setNote(t); };
+        mic.onerror = () => { mic.stop(); setIsListening(false); };
+        mic.onend = () => { setIsListening(false); };
+        mic.start(); setIsListening(true);
+      };
+
+      const addTask = (e) => {
+        if (e) e.preventDefault();
+        if (!note.trim()) return;
+        setTasks([...tasks, { id: Date.now().toString(), text: note, status: 'pending', folder: currentFolder, assigneeId: isGroupView && selectedAssignee ? selectedAssignee : null, completedById: null }]);
+        setNote('');
+        if (isListening && micRef.current) { micRef.current.stop(); setIsListening(false); }
+      };
+
+      const setTaskStatus = (id, newStatus) => {
+        setTasks(tasks.map(t => t.id === id ? { ...t, status: newStatus, completedById: newStatus === 'completed' ? (t.assigneeId || user.id) : null } : t));
+      };
+      const toggleTaskComplete = (task) => { setTaskStatus(task.id, task.status === 'completed' ? 'pending' : 'completed'); };
+      const deleteTask = (id) => { setTasks(tasks.filter(t => t.id !== id)); };
+      const addFolder = () => { const n = newFolderName.trim(); if (!n || folders.includes(n)) return; setFolders([...folders, n]); setNewFolderName(''); setShowNewFolder(false); setCurrentFolder(n); };
+
+      // Inline AI arrangement (mock — alphabetical sort, same as original backend)
+      const arrangeWithAI = () => {
+        const folderTasks = tasks.filter(t => t.folder === currentFolder && t.status === 'pending');
+        const arranged = [...folderTasks].sort((a, b) => a.text.localeCompare(b.text));
+        const otherTasks = tasks.filter(t => t.folder !== currentFolder || t.status !== 'pending');
+        setTasks([...otherTasks, ...arranged]);
+      };
+
+      const currentTasks = tasks.filter(t => t.folder === currentFolder);
+      const pendingTasks = currentTasks.filter(t => t.status === 'pending' || t.status === 'extended');
+      const completedCount = currentTasks.filter(t => t.status === 'completed').length;
+      const abandonedCount = currentTasks.filter(t => t.status === 'abandoned').length;
+      const pendingCount = pendingTasks.length;
+      const CHART_COLORS = ['#10b981', '#f59e0b', '#ef4444'];
+      const chartData = [{ name: 'Completed', value: completedCount }, { name: 'Pending/Extended', value: pendingCount }, { name: 'Abandoned', value: abandonedCount }].filter(d => d.value > 0);
+
+      const getContributionData = () => {
+        if (!activeGroup) return [];
+        const stats = {}; activeGroup.members.forEach(mId => { stats[mId] = 0; });
+        currentTasks.forEach(t => { if (t.status === 'completed' && t.completedById && stats[t.completedById] !== undefined) stats[t.completedById] += 1; });
+        return Object.keys(stats).map(mId => ({ name: mId === user.id ? 'You' : `User ${mId.substring(0, 4)}`, completed: stats[mId] })).sort((a, b) => b.completed - a.completed);
+      };
+
+      const getStatusIcon = (status) => {
+        switch(status) { case 'completed': return <Icon name="checkCircle" size={20} color="#10b981" />; case 'abandoned': return <Icon name="xCircle" size={20} color="#ef4444" />; case 'extended': return <Icon name="clock" size={20} color="#f59e0b" />; default: return <Icon name="circle" size={20} />; }
+      };
+
+      return (
+        <div className="tasks-page animate-fade-in">
+          <div className="tasks-header">
+            <div><h1>Tasks &amp; AI</h1><p>Organize your day, visually.</p></div>
+            <button className="btn btn-primary" onClick={arrangeWithAI}><Icon name="sparkles" size={18} /> Arrange with AI</button>
+          </div>
+          <div className="grid-layout">
+            <div className="glass-panel tasks-container">
+              <div className="folder-tabs">
+                {folders.map(f => (<button key={f} className={`folder-tab ${currentFolder === f ? 'active' : ''}`} onClick={() => setCurrentFolder(f)}><Icon name="folder" size={14} /> {f}</button>))}
+                {groups.map(g => (<button key={g.id} className={`folder-tab group-tab ${currentFolder === g.id ? 'active' : ''}`} onClick={() => { setCurrentFolder(g.id); setSelectedAssignee(''); }}><Icon name="users" size={14} /> {g.name}</button>))}
+                {showNewFolder ? (
+                  <div className="new-folder-input"><input type="text" className="input-field" placeholder="Folder name" value={newFolderName} onChange={(e) => setNewFolderName(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && addFolder()} autoFocus style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', width: '120px' }} /></div>
+                ) : (<button className="folder-tab" onClick={() => setShowNewFolder(true)}><Icon name="folderPlus" size={14} /> New</button>)}
+              </div>
+              <form onSubmit={addTask} className="task-input-form">
+                <div className="task-input-row">
+                  <input type="text" className="input-field" placeholder={isGroupView ? 'Add a group task...' : 'Add a new task...'} value={note} onChange={(e) => setNote(e.target.value)} />
+                  <button type="button" className={`btn-icon ${isListening ? 'listening' : ''}`} onClick={handleListen} title="Voice Input">
+                    {isListening ? <Icon name="micOff" size={20} /> : <Icon name="mic" size={20} />}
+                  </button>
+                  <button type="submit" className="btn-icon add-btn"><Icon name="plus" size={20} /></button>
+                </div>
+                {isGroupView && (
+                  <div className="assignee-select">
+                    <span className="text-sm text-muted">Assign to:</span>
+                    <select className="input-field select-sm" value={selectedAssignee} onChange={(e) => setSelectedAssignee(e.target.value)}>
+                      <option value="">Anyone</option>
+                      {activeGroup.members.map(mId => (<option key={mId} value={mId}>{mId === user.id ? 'Me' : `User ${mId.substring(0, 4)}`}</option>))}
+                    </select>
+                  </div>
+                )}
+              </form>
+              <div className="task-list">
+                {currentTasks.length === 0 && <p className="empty-state">No tasks here yet.</p>}
+                {currentTasks.map(task => (
+                  <div key={task.id} className={`task-item status-${task.status}`}>
+                    <button className="check-btn" onClick={() => toggleTaskComplete(task)}>{getStatusIcon(task.status)}</button>
+                    <div className="task-content">
+                      <span className="task-text">{task.text}</span>
+                      {task.assigneeId && <span className="task-assignee"><Icon name="user" size={12} /> {task.assigneeId === user.id ? 'You' : `User ${task.assigneeId.substring(0, 4)}`}</span>}
+                    </div>
+                    <div className="task-actions">
+                      {task.status !== 'completed' && task.status !== 'abandoned' && (<>
+                        <button className="action-btn text-warning" onClick={() => setTaskStatus(task.id, 'extended')} title="Extend Task"><Icon name="clock" size={16} /></button>
+                        <button className="action-btn text-danger" onClick={() => setTaskStatus(task.id, 'abandoned')} title="Abandon Task"><Icon name="xCircle" size={16} /></button>
+                      </>)}
+                      <button className="action-btn text-muted hover-danger" onClick={() => deleteTask(task.id)} title="Delete permanently"><Icon name="trash2" size={16} /></button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="glass-panel stats-container flex-col-gap">
+              <div className="stat-card">
+                <h3>Progress Graph</h3>
+                {chartData.length > 0 ? (
+                  <div>
+                    <DonutChart data={chartData} colors={CHART_COLORS} />
+                    <div className="chart-legend">
+                      {chartData.map((d, i) => (<span key={d.name} style={{ color: CHART_COLORS[i] }}>● {d.name}: {d.value}</span>))}
+                    </div>
+                  </div>
+                ) : (<p className="empty-state text-sm">Add tasks to see progress.</p>)}
+              </div>
+              {isGroupView && currentTasks.length > 0 && (
+                <div className="stat-card">
+                  <h3>Contribution Leaderboard</h3>
+                  <div style={{ marginTop: '1rem' }}><HBarChart data={getContributionData()} /></div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // ==================== SOCIAL ====================
+    const Social = () => {
+      const { user, addFriend } = useUser();
+      const [friendId, setFriendId] = useState('');
+      const [copied, setCopied] = useState(false);
+      const handleAddFriend = (e) => { e.preventDefault(); if (!friendId.trim()) return; addFriend(friendId); setFriendId(''); alert(`Friend request sent / added ID: ${friendId}`); };
+      const shareLink = `${window.location.origin || window.location.href.split('/').slice(0,-1).join('/')}/add/${user.id}`;
+      const handleCopy = () => { navigator.clipboard.writeText(shareLink).catch(() => {}); setCopied(true); setTimeout(() => setCopied(false), 2000); };
+
+      return (
+        <div className="social-page animate-fade-in">
+          <div><h1>Friends &amp; Family</h1><p>Share lists and split bills seamlessly.</p></div>
+          <div className="grid-layout">
+            <div className="glass-panel add-friend-container">
+              <h3><Icon name="userPlus" size={20} style={{ marginRight: '8px' }} />Add a Friend</h3>
+              <p className="text-muted">No phone numbers or emails needed. Just use their 9-digit ID or share your link.</p>
+              <form onSubmit={handleAddFriend} className="add-friend-form">
+                <input type="text" className="input-field" placeholder="Enter 9-digit ID" value={friendId} onChange={(e) => setFriendId(e.target.value)} />
+                <button type="submit" className="btn btn-primary">Add</button>
+              </form>
+              <div className="divider"><span>OR</span></div>
+              <div className="share-link-box">
+                <span className="share-label">Your Share Link:</span>
+                <div className="link-wrapper">
+                  <input type="text" readOnly value={shareLink} className="input-field link-input" />
+                  <button className="btn-icon" onClick={handleCopy} title="Copy Link">
+                    {copied ? <Icon name="checkCircle" size={18} color="var(--color-accent)" /> : <Icon name="copy" size={18} />}
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div className="glass-panel friends-list-container">
+              <h3><Icon name="users" size={20} style={{ marginRight: '8px' }} />My Friends</h3>
+              <div className="friends-list">
+                {user.friends.length === 0 ? <p className="empty-state">You haven't added any friends yet.</p> :
+                  user.friends.map(id => (
+                    <div key={id} className="friend-item">
+                      <div className="pfp-placeholder">{id.charAt(0)}</div>
+                      <div className="friend-details">
+                        <span className="friend-name">User {id.substring(0, 4)}...</span>
+                        <span className="friend-id">ID: {id}</span>
+                      </div>
+                    </div>
+                  ))
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // ==================== BILLS ====================
+    const Bills = () => {
+      const { user } = useUser();
+      const [amount, setAmount] = useState('');
+      const [description, setDescription] = useState('');
+      const [taggedFriends, setTaggedFriends] = useState([]);
+      const [expenses, setExpenses] = useState(() => { const s = localStorage.getItem('omnitool_expenses'); return s ? JSON.parse(s) : []; });
+      useEffect(() => { localStorage.setItem('omnitool_expenses', JSON.stringify(expenses)); }, [expenses]);
+
+      const handleTag = (fid) => { setTaggedFriends(taggedFriends.includes(fid) ? taggedFriends.filter(id => id !== fid) : [...taggedFriends, fid]); };
+      const handleAddExpense = (e) => {
+        e.preventDefault(); if (!amount || !description) return;
+        setExpenses([{ id: Date.now(), amount: parseFloat(amount), description, tagged: taggedFriends, date: new Date().toLocaleDateString(), by: user.id }, ...expenses]);
+        setAmount(''); setDescription(''); setTaggedFriends([]);
+        if (taggedFriends.length > 0) alert(`Notifications sent to ${taggedFriends.length} friend(s) about the bill split!`);
+      };
+      const deleteExpense = (id) => { setExpenses(expenses.filter(e => e.id !== id)); };
+
+      return (
+        <div className="bills-page animate-fade-in">
+          <div><h1>Bill Splitting &amp; Prices</h1><p>Split bills and compare prices easily.</p></div>
+          <div className="grid-layout">
+            <div className="glass-panel add-expense-container">
+              <h3><Icon name="shoppingCart" size={20} style={{ marginRight: '8px' }} />Add Expense</h3>
+              <form onSubmit={handleAddExpense} className="expense-form">
+                <div className="form-group">
+                  <label>Amount ($)</label>
+                  <div className="input-with-icon">
+                    <Icon name="dollarSign" size={16} className="icon-inside" />
+                    <input type="number" step="0.01" className="input-field" placeholder="0.00" value={amount} onChange={(e) => setAmount(e.target.value)} required />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Description (Item/Price comparison)</label>
+                  <input type="text" className="input-field" placeholder="Dinner at Joe's" value={description} onChange={(e) => setDescription(e.target.value)} required />
+                </div>
+                <div className="form-group">
+                  <label><Icon name="tag" size={16} /> Tag Friends to Split</label>
+                  <div className="tag-friends-list">
+                    {user.friends.length === 0 ? <p className="text-muted text-sm">Add friends first in the Friends tab to tag them.</p> :
+                      user.friends.map(id => (<button key={id} type="button" className={`friend-tag ${taggedFriends.includes(id) ? 'selected' : ''}`} onClick={() => handleTag(id)}>User {id.substring(0, 4)}</button>))
+                    }
+                  </div>
+                </div>
+                <button type="submit" className="btn btn-primary">Add &amp; Split</button>
+              </form>
+            </div>
+            <div className="glass-panel recent-expenses-container">
+              <h3>Recent Activity</h3>
+              <div className="expense-list">
+                {expenses.length === 0 ? <p className="empty-state">No expenses added yet.</p> :
+                  expenses.map(exp => {
+                    const splitAmount = exp.tagged.length > 0 ? (exp.amount / (exp.tagged.length + 1)).toFixed(2) : exp.amount.toFixed(2);
+                    return (
+                      <div key={exp.id} className="expense-item">
+                        <div className="expense-info"><span className="expense-desc">{exp.description}</span><span className="expense-date">{exp.date}</span></div>
+                        <div className="expense-amounts">
+                          <span className="total-amount">${exp.amount.toFixed(2)}</span>
+                          {exp.tagged.length > 0 && <span className="split-amount text-muted"><Icon name="bell" size={12} /> Split: ${splitAmount}/person</span>}
+                        </div>
+                        <button className="delete-btn expense-delete" onClick={() => deleteExpense(exp.id)} title="Delete"><Icon name="trash2" size={14} /></button>
+                      </div>
+                    );
+                  })
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+
+    // ==================== MESSAGES ====================
+    const Messages = () => {
+      const { user, groups, createGroup, sendMessage, getMessages, toggleStarMessage, getMessageExpiry } = useUser();
+      const [activeView, setActiveView] = useState('list');
+      const [activeChat, setActiveChat] = useState(null);
+      const [msgText, setMsgText] = useState('');
+      const [newGroupName, setNewGroupName] = useState('');
+      const [selectedMembers, setSelectedMembers] = useState([]);
+      const chatEndRef = useRef(null);
+
+      const currentMessages = activeChat ? getMessages(activeChat.id) : [];
+      useEffect(() => { if (chatEndRef.current) chatEndRef.current.scrollIntoView({ behavior: 'smooth' }); }, [currentMessages.length]);
+
+      const handleSend = (e) => { e.preventDefault(); if (!msgText.trim() || !activeChat) return; sendMessage(activeChat.id, activeChat.type, msgText.trim()); setMsgText(''); };
+      const openDM = (friendId) => { setActiveChat({ id: friendId, name: `User ${friendId.substring(0, 4)}...`, type: 'dm' }); setActiveView('chat'); };
+      const openGroup = (group) => { setActiveChat({ id: group.id, name: group.name, type: 'group' }); setActiveView('chat'); };
+      const handleCreateGroup = (e) => {
+        e.preventDefault(); if (!newGroupName.trim() || selectedMembers.length === 0) return;
+        const group = createGroup(newGroupName.trim(), selectedMembers);
+        setNewGroupName(''); setSelectedMembers([]); setActiveView('list'); openGroup(group);
+      };
+      const toggleMember = (id) => { setSelectedMembers(selectedMembers.includes(id) ? selectedMembers.filter(m => m !== id) : [...selectedMembers, id]); };
+      const formatTime = (iso) => new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      // Chat View
+      if (activeView === 'chat' && activeChat) {
+        return (
+          <div className="messages-page animate-fade-in">
+            <div className="glass-panel chat-panel">
+              <div className="chat-header">
+                <button className="btn-icon back-btn" onClick={() => setActiveView('list')}><Icon name="arrowLeft" size={20} /></button>
+                <div className="chat-header-info">
+                  <div className="chat-avatar">{activeChat.type === 'group' ? <Icon name="users" size={18} /> : activeChat.name.charAt(0)}</div>
+                  <div><h3>{activeChat.name}</h3><span className="chat-type-label">{activeChat.type === 'group' ? 'Group' : 'Direct Message'}</span></div>
+                </div>
+                <div className="chat-header-hint"><span className="expiry-hint">💡 Messages expire in 3 days · ⭐ Star to keep 3 weeks</span></div>
+              </div>
+              <div className="chat-messages">
+                {currentMessages.length === 0 && <p className="empty-state">No messages yet. Say hello! 👋</p>}
+                {currentMessages.map(msg => (
+                  <div key={msg.id} className={`chat-bubble ${msg.from === user.id ? 'mine' : 'theirs'} ${msg.starred ? 'starred' : ''}`}>
+                    {activeChat.type === 'group' && msg.from !== user.id && <span className="bubble-sender">{msg.fromName}</span>}
+                    <p>{msg.text}</p>
+                    <div className="bubble-footer">
+                      <span className="bubble-expiry">{getMessageExpiry(msg)}</span>
+                      <span className="bubble-time">{formatTime(msg.timestamp)}</span>
+                      <button className={`star-btn ${msg.starred ? 'active' : ''}`} onClick={() => toggleStarMessage(msg.id)} title={msg.starred ? 'Unstar (reverts to 3-day expiry)' : 'Star (keep for 3 weeks)'}>
+                        <Icon name="star" size={12} fill={msg.starred ? 'currentColor' : 'none'} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                <div ref={chatEndRef} />
+              </div>
+              <form onSubmit={handleSend} className="chat-input-form">
+                <input type="text" className="input-field" placeholder="Type a message..." value={msgText} onChange={(e) => setMsgText(e.target.value)} autoFocus />
+                <button type="submit" className="btn-icon send-btn"><Icon name="send" size={20} /></button>
+              </form>
+            </div>
+          </div>
+        );
+      }
+
+      // Create Group View
+      if (activeView === 'create-group') {
+        return (
+          <div className="messages-page animate-fade-in">
+            <div className="glass-panel create-group-panel">
+              <div className="panel-header">
+                <button className="btn-icon back-btn" onClick={() => setActiveView('list')}><Icon name="arrowLeft" size={20} /></button>
+                <h2>Create Group</h2>
+              </div>
+              <form onSubmit={handleCreateGroup} className="create-group-form">
+                <div className="form-group">
+                  <label>Group Name</label>
+                  <input type="text" className="input-field" placeholder="E.g. Family Trip, Study Group" value={newGroupName} onChange={(e) => setNewGroupName(e.target.value)} required autoFocus />
+                </div>
+                <div className="form-group">
+                  <label>Add Members</label>
+                  {user.friends.length === 0 ? <p className="text-muted">You need to add friends first before creating a group.</p> : (
+                    <div className="member-select-list">
+                      {user.friends.map(id => (
+                        <button key={id} type="button" className={`member-chip ${selectedMembers.includes(id) ? 'selected' : ''}`} onClick={() => toggleMember(id)}>
+                          <div className="pfp-placeholder small">{id.charAt(0)}</div>User {id.substring(0, 4)}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {selectedMembers.length > 0 && <p className="selected-count">{selectedMembers.length} member(s) selected</p>}
+                </div>
+                <button type="submit" className="btn btn-primary" disabled={!newGroupName.trim() || selectedMembers.length === 0}>
+                  <Icon name="users" size={18} /> Create Group
+                </button>
+              </form>
+            </div>
+          </div>
+        );
+      }
+
+      // List View (default)
+      return (
+        <div className="messages-page animate-fade-in">
+          <div className="messages-header">
+            <div><h1>Messages</h1><p>Chat with friends or in groups. Messages auto-expire after 3 days.</p></div>
+            <button className="btn btn-primary" onClick={() => setActiveView('create-group')}><Icon name="plus" size={18} /> New Group</button>
+          </div>
+          <div className="grid-layout">
+            <div className="glass-panel chat-list-panel">
+              <h3><Icon name="hash" size={20} style={{ marginRight: '8px' }} />Groups</h3>
+              <div className="chat-list">
+                {groups.length === 0 ? <p className="empty-state">No groups yet. Create one!</p> :
+                  groups.map(group => {
+                    const lastMsg = getMessages(group.id).slice(-1)[0];
+                    return (
+                      <button key={group.id} className="chat-list-item" onClick={() => openGroup(group)}>
+                        <div className="chat-avatar group-avatar"><Icon name="users" size={18} /></div>
+                        <div className="chat-list-info">
+                          <span className="chat-list-name">{group.name}</span>
+                          <span className="chat-list-preview">{lastMsg ? `${lastMsg.fromName}: ${lastMsg.text}` : `${group.members.length} members`}</span>
+                        </div>
+                        {lastMsg && <span className="chat-list-time">{formatTime(lastMsg.timestamp)}</span>}
+                      </button>
+                    );
+                  })
+                }
+              </div>
+            </div>
+            <div className="glass-panel chat-list-panel">
+              <h3><Icon name="messageCircle" size={20} style={{ marginRight: '8px' }} />Direct Messages</h3>
+              <div className="chat-list">
+                {user.friends.length === 0 ? <p className="empty-state">Add friends to start chatting.</p> :
+                  user.friends.map(friendId => {
+                    const lastMsg = getMessages(friendId).slice(-1)[0];
+                    return (
+                      <button key={friendId} className="chat-list-item" onClick={() => openDM(friendId)}>
+                        <div className="chat-avatar">{friendId.charAt(0)}</div>
+                        <div className="chat-list-info">
+                          <span className="chat-list-name">User {friendId.substring(0, 4)}...</span>
+                          <span className="chat-list-preview">{lastMsg ? lastMsg.text : 'Tap to start chatting'}</span>
+                        </div>
+                        {lastMsg && <span className="chat-list-time">{formatTime(lastMsg.timestamp)}</span>}
+                      </button>
+                    );
+                  })
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // ==================== NOTEPAD ====================
+    const COLORS = ['#f8fafc', '#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899'];
+    const SIZES = [2, 4, 8, 12];
+
+    const Notepad = () => {
+      const [mode, setMode] = useState('draw');
+      const [notes, setNotes] = useState(() => { const s = localStorage.getItem('omnitool_notes'); return s ? JSON.parse(s) : []; });
+      const [activeNote, setActiveNote] = useState(null);
+      const [noteText, setNoteText] = useState('');
+      const [noteTitle, setNoteTitle] = useState('');
+      const canvasRef = useRef(null);
+      const ctxRef = useRef(null);
+      const [isDrawing, setIsDrawing] = useState(false);
+      const [color, setColor] = useState('#f8fafc');
+      const [brushSize, setBrushSize] = useState(4);
+      const [isEraser, setIsEraser] = useState(false);
+
+      useEffect(() => { localStorage.setItem('omnitool_notes', JSON.stringify(notes)); }, [notes]);
+
+      useEffect(() => {
+        if (mode === 'draw' && canvasRef.current) {
+          const canvas = canvasRef.current;
+          canvas.width = canvas.offsetWidth;
+          canvas.height = canvas.offsetHeight;
+          const ctx = canvas.getContext('2d');
+          ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+          ctxRef.current = ctx;
+          if (activeNote && activeNote.type === 'drawing' && activeNote.data) {
+            const img = new Image(); img.onload = () => ctx.drawImage(img, 0, 0); img.src = activeNote.data;
+          }
+        }
+      }, [mode, activeNote]);
+
+      const getPos = (e) => {
+        const rect = canvasRef.current.getBoundingClientRect();
+        if (e.touches) return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+        return { x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY };
+      };
+      const startDrawing = (e) => { e.preventDefault(); const { x, y } = getPos(e); ctxRef.current.beginPath(); ctxRef.current.moveTo(x, y); setIsDrawing(true); };
+      const draw = useCallback((e) => {
+        e.preventDefault(); if (!isDrawing) return;
+        const { x, y } = getPos(e); const ctx = ctxRef.current;
+        ctx.strokeStyle = isEraser ? '#0f172a' : color;
+        ctx.lineWidth = isEraser ? brushSize * 3 : brushSize;
+        ctx.lineTo(x, y); ctx.stroke();
+      }, [isDrawing, color, brushSize, isEraser]);
+      const stopDrawing = () => setIsDrawing(false);
+      const clearCanvas = () => { const c = canvasRef.current; ctxRef.current.clearRect(0, 0, c.width, c.height); };
+
+      const saveNote = () => {
+        const title = noteTitle.trim() || `Note ${notes.length + 1}`;
+        let noteData;
+        if (mode === 'draw') { noteData = { id: activeNote?.id || Date.now(), title, type: 'drawing', data: canvasRef.current.toDataURL(), updatedAt: new Date().toISOString() }; }
+        else { noteData = { id: activeNote?.id || Date.now(), title, type: 'text', data: noteText, updatedAt: new Date().toISOString() }; }
+        if (activeNote) { setNotes(notes.map(n => n.id === activeNote.id ? noteData : n)); }
+        else { setNotes([noteData, ...notes]); }
+        setActiveNote(null); setNoteText(''); setNoteTitle('');
+      };
+      const openNote = (note) => { setActiveNote(note); setNoteTitle(note.title); if (note.type === 'text') { setMode('text'); setNoteText(note.data); } else { setMode('draw'); } };
+      const deleteNote = (id) => { setNotes(notes.filter(n => n.id !== id)); if (activeNote?.id === id) { setActiveNote(null); setNoteText(''); setNoteTitle(''); } };
+      const downloadDrawing = () => { const link = document.createElement('a'); link.download = `${noteTitle || 'drawing'}.png`; link.href = canvasRef.current.toDataURL(); link.click(); };
+      const newNote = (type) => { setActiveNote(null); setNoteTitle(''); setNoteText(''); setMode(type); };
+
+      return (
+        <div className="notepad-page animate-fade-in">
+          <div className="notepad-header">
+            <div><h1>Notepad</h1><p>Type or draw your ideas.</p></div>
+            <div className="notepad-actions">
+              <button className="btn btn-ghost" onClick={() => newNote('text')}><Icon name="type" size={18} /> New Text</button>
+              <button className="btn btn-primary" onClick={() => newNote('draw')}><Icon name="penTool" size={18} /> New Drawing</button>
+            </div>
+          </div>
+          <div className="grid-layout">
+            <div className="glass-panel editor-panel">
+              <div className="editor-toolbar">
+                <input type="text" className="input-field title-input" placeholder="Note title..." value={noteTitle} onChange={(e) => setNoteTitle(e.target.value)} />
+                <button className="btn btn-primary btn-sm" onClick={saveNote}><Icon name="save" size={16} /> Save</button>
+              </div>
+              {mode === 'text' ? (
+                <textarea className="input-field text-editor" placeholder="Start typing your note..." value={noteText} onChange={(e) => setNoteText(e.target.value)} />
+              ) : (<>
+                <div className="draw-toolbar">
+                  <div className="color-picker">
+                    {COLORS.map(c => (<button key={c} className={`color-dot ${color === c && !isEraser ? 'active' : ''}`} style={{ backgroundColor: c }} onClick={() => { setColor(c); setIsEraser(false); }} />))}
+                  </div>
+                  <div className="size-picker">
+                    {SIZES.map(s => (<button key={s} className={`size-dot ${brushSize === s ? 'active' : ''}`} onClick={() => setBrushSize(s)}><span style={{ width: s + 4, height: s + 4 }}></span></button>))}
+                  </div>
+                  <button className={`btn-icon tool-btn ${isEraser ? 'eraser-active' : ''}`} onClick={() => setIsEraser(!isEraser)} title="Eraser"><Icon name="eraser" size={18} /></button>
+                  <button className="btn-icon tool-btn" onClick={clearCanvas} title="Clear"><Icon name="trash2" size={18} /></button>
+                  <button className="btn-icon tool-btn" onClick={downloadDrawing} title="Download"><Icon name="download" size={18} /></button>
+                </div>
+                <canvas ref={canvasRef} className="draw-canvas"
+                  onMouseDown={startDrawing} onMouseMove={draw} onMouseUp={stopDrawing} onMouseLeave={stopDrawing}
+                  onTouchStart={startDrawing} onTouchMove={draw} onTouchEnd={stopDrawing} />
+              </>)}
+            </div>
+            <div className="glass-panel notes-list-panel">
+              <h3>Saved Notes</h3>
+              <div className="notes-list">
+                {notes.length === 0 && <p className="empty-state">No notes saved yet.</p>}
+                {notes.map(note => (
+                  <div key={note.id} className="note-card" onClick={() => openNote(note)}>
+                    <div className="note-card-header">
+                      <span className="note-type-badge">{note.type === 'drawing' ? '🎨' : '📝'}</span>
+                      <span className="note-title">{note.title}</span>
+                      <button className="delete-btn" onClick={(e) => { e.stopPropagation(); deleteNote(note.id); }}><Icon name="trash2" size={14} /></button>
+                    </div>
+                    {note.type === 'drawing' ? <img src={note.data} alt={note.title} className="note-thumbnail" /> : <p className="note-preview">{note.data.substring(0, 80)}...</p>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // ==================== APP ====================
+    const App = () => {
+      const [currentPage, setCurrentPage] = useState('dashboard');
+
+      return (
+        <UserProvider>
+          <AppLayout currentPage={currentPage} setCurrentPage={setCurrentPage} />
+        </UserProvider>
+      );
+    };
+
+    const AppLayout = ({ currentPage, setCurrentPage }) => {
+      const { user } = useUser();
+      if (!user) return <Login />;
+
+      const renderPage = () => {
+        switch (currentPage) {
+          case 'tasks': return <Tasks />;
+          case 'social': return <Social />;
+          case 'bills': return <Bills />;
+
+          case 'messages': return <Messages />;
+          case 'notepad': return <Notepad />;
+          default: return <Dashboard />;
+        }
+      };
+
+      return (
+        <div className="app-container">
+          <Sidebar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+          <main className="main-content">{renderPage()}</main>
+        </div>
+      );
+    };
+
+    // ==================== RENDER ====================
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
