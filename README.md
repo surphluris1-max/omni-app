@@ -1,4 +1,4 @@
-# OmniTool - Multi-Tool Super App
+# OmniTool - Multi-Tool Super App  [html file is a demo of the frontend and backend version of the app/file but it have a little less feature]
 
 A responsive, full-stack web application combining productivity, social sharing, finance, AI tools, and messaging into one beautiful interface. Call it a Small dino app cuz it have more than one feature
 
